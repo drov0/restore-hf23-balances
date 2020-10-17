@@ -67,7 +67,7 @@ async function send_instantly(){
     const props = await client.database.getDynamicGlobalProperties();
 
     const privateKey = dhive.PrivateKey.fromString("your private key here");
-    const username = "blocktrades"
+    const username = "alpha"
     let vops = await client.database.call('get_ops_in_block', [hf24_blocknum, false])
 
     let ops = []
