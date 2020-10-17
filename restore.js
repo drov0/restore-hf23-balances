@@ -76,7 +76,7 @@ async function send_instantly(){
         const vop = vops[i]
         if (vop.op[0] === "hardfork_hive" && restored_accounts.indexOf(vop.op[1].account) !== -1) {
             // Convert the converted vests to hive
-            let hiveToTransfer = parseFloat(parseFloat(props.total_vesting_fund_hive) * parseFloat(vop.op[1].vests_converted) / parseFloat(props.total_vesting_shares)).toFixed(6);
+            let hiveToTransfer = parseFloat(parseFloat(props.total_vesting_fund_hive) * parseFloat(vop.op[1].vests_converted) / parseFloat(props.total_vesting_shares)).toFixed(3);
             ops.push([
                 "transfer",
                 {from: username, to: vop.op[1].account, amount: `${hiveToTransfer} HIVE`, memo: memo}
