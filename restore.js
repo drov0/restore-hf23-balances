@@ -63,11 +63,11 @@ const hf24_blocknum = 41818752
 
 // Sends to everyone in the same block
 async function send_instantly(){
+    const dry_run = true
     const props = await client.database.getDynamicGlobalProperties();
 
     const privateKey = dhive.PrivateKey.fromString("your private key here");
     const username = "blocktrades"
-    const memo = "Restoring the missing vests from hf24"
     let vops = await client.database.call('get_ops_in_block', [hf24_blocknum, false])
 
     let ops = []
@@ -78,8 +78,12 @@ async function send_instantly(){
             // Convert the converted vests to hive
             let hiveToTransfer = parseFloat(parseFloat(props.total_vesting_fund_hive) * parseFloat(vop.op[1].vests_converted) / parseFloat(props.total_vesting_shares)).toFixed(3);
             ops.push([
-                "transfer",
-                {from: username, to: vop.op[1].account, amount: `${hiveToTransfer} HIVE`, memo: memo}
+                "transfer_to_vesting",
+                {
+                    from: username,
+                    to: vop.op[1].account,
+                    amount: `${hiveToTransfer} HIVE`
+                }
             ])
             total_hive += parseFloat(hiveToTransfer)
         }
@@ -89,14 +93,18 @@ async function send_instantly(){
         console.error("Did not find some of the restored accounts in the vops")
     }
 
-    console.log(`transferring ${total_hive} to ${ops.length} accounts`)
+    console.log(`powering up ${total_hive} to ${ops.length} accounts`)
     console.log(ops)
 
-    client.broadcast.sendOperations(ops, privateKey).then(function (result) {
-        console.log('Included in block: ' + result.block_num)
-    }, function (error) {
-        console.error(error);
-    });
+    if (!dry_run) {
+        client.broadcast.sendOperations(ops, privateKey).then(function (result) {
+            console.log('Included in block: ' + result.block_num)
+        }, function (error) {
+            console.error(error);
+        });
+    } else {
+        console.log("set dry run to false if you want to execute the operation")
+    }
 }
 
 send_instantly()
